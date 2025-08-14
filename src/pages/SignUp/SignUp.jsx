@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import './SignUp.css';
@@ -69,9 +70,9 @@ const SignUp = () => {
 
   return (
     <div className="register-container">
- 
       <h2>Реєстрація</h2>
       <form className="register-form" onSubmit={handleSubmit}>
+        {/* ...існуючі поля реєстрації... */}
         <input
           type="text"
           name="name"
@@ -136,10 +137,37 @@ const SignUp = () => {
         {success && <div className="success">{success}</div>}
         <button type="submit">Зареєструватися</button>
       </form>
-        <div className="signin-link">
-          Вже маєте акаунт?{' '}
-          <Link to="/signin">Увійти</Link>
-        </div>
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <GoogleOAuthProvider clientId="411952234902-th0g5fji6s9cept1tkqmdn8qj5brivhc.apps.googleusercontent.com">
+          <GoogleLogin
+            onSuccess={credentialResponse => {
+              fetch('http://localhost:5000/api/google-auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: credentialResponse.credential })
+              })
+                .then(res => res.json())
+                .then(data => {
+                  if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    window.dispatchEvent(new Event('storage'));
+                    navigate('/');
+                  } else {
+                    alert(data.error || 'Помилка Google реєстрації');
+                  }
+                });
+            }}
+            onError={() => {
+              console.log('Google Sign Up Failed');
+            }}
+            text="signup_with"
+          />
+        </GoogleOAuthProvider>
+      </div>
+      <div className="signin-link">
+        Вже маєте акаунт?{' '}
+        <Link to="/signin">Увійти</Link>
+      </div>
     </div>
   );
 };

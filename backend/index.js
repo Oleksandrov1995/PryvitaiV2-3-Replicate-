@@ -5,6 +5,13 @@ import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import { OAuth2Client } from 'google-auth-library';
+dotenv.config();
+
+// ...ініціалізація app, JWT_SECRET, mongoUri, userSchema, User вже є вище...
+
+// Google OAuth endpoint
+// ...імпорти вже є вище...
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
@@ -25,6 +32,31 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', userSchema);
+
+// Google OAuth endpoint
+app.post('/api/google-auth', async (req, res) => {
+  const { credential } = req.body;
+  if (!credential) {
+    return res.status(400).json({ error: 'Не передано credential.' });
+  }
+  try {
+    const client = new OAuth2Client();
+    const ticket = await client.verifyIdToken({ idToken: credential, audience: process.env.GOOGLE_CLIENT_ID });
+    const payload = ticket.getPayload();
+    const email = payload.email;
+    const name = payload.name || email.split('@')[0];
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = new User({ name, email, password: '' });
+      await user.save();
+    }
+    const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: '2h' });
+    res.json({ message: 'Вхід через Google успішний!', token });
+  } catch (err) {
+    console.error('Google auth error:', err);
+    res.status(500).json({ error: 'Помилка Google авторизації.' });
+  }
+});
 
 // Відновлення пароля: приймає email, надсилає email з посиланням
 app.post('/api/forgot-password', async (req, res) => {

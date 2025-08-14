@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import './SignIn.css';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
@@ -154,6 +155,33 @@ const SignIn = () => {
           <button type="button" style={{ marginTop: '10px' }} onClick={() => setShowForgot(false)}>Назад</button>
         </form>
       )}
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <GoogleOAuthProvider clientId="411952234902-th0g5fji6s9cept1tkqmdn8qj5brivhc.apps.googleusercontent.com">
+          <GoogleLogin
+            onSuccess={credentialResponse => {
+              fetch('http://localhost:5000/api/google-auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: credentialResponse.credential })
+              })
+                .then(res => res.json())
+                .then(data => {
+                  if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    window.dispatchEvent(new Event('storage'));
+                    navigate('/');
+                  } else {
+                    alert(data.error || 'Помилка Google входу');
+                  }
+                });
+            }}
+            onError={() => {
+              console.log('Google Sign In Failed');
+            }}
+            text="signin_with"
+          />
+        </GoogleOAuthProvider>
+      </div>
       <div className="signup-link">
         Ще не маєте акаунта?{' '}
         <Link to="/signUp">Зареєструватися</Link>
