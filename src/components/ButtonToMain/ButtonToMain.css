@@ -1,0 +1,21 @@
+/* Кнопка завжди у лівому верхньому куті */
+.button-to-main {
+	position: fixed;
+	top: 20px;
+	left: 20px;
+	z-index: 1000;
+	background-color: #282c34;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	padding: 10px 20px;
+	font-size: 1rem;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	cursor: pointer;
+	transition: background 0.2s, box-shadow 0.2s;
+}
+
+.button-to-main:hover {
+	background-color: #3a3f47;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}

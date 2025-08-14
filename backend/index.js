@@ -1,0 +1,132 @@
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+const mongoUri = process.env.MONGODB_URI;
+mongoose.connect(mongoUri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true },
+  password: String,
+});
+
+const User = mongoose.model('User', userSchema);
+
+// Відновлення пароля: приймає email, надсилає email з посиланням
+app.post('/api/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Email обовʼязковий.' });
+  }
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(400).json({ error: 'Користувача з таким email не знайдено.' });
+  }
+  // Генеруємо токен для відновлення пароля (діє 15 хвилин)
+  const resetToken = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: '15m' });
+  const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+
+  // Налаштування транспорту (Gmail, Ukr.net, Outlook тощо)
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Відновлення пароля Pryvitai',
+      html: `<p>Для відновлення пароля перейдіть за <a href="${resetLink}">цим посиланням</a>.<br>Посилання дійсне 15 хвилин.</p>`
+    });
+    res.json({ message: 'Інструкції для відновлення пароля надіслані на email.' });
+  } catch (err) {
+    console.error('Email error:', err);
+    res.status(500).json({ error: 'Не вдалося надіслати email.' });
+  }
+});
+
+// Зміна пароля за токеном
+app.post('/api/reset-password', async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) {
+    return res.status(400).json({ error: 'Токен і новий пароль обовʼязкові.' });
+  }
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(400).json({ error: 'Користувача не знайдено.' });
+    }
+    user.password = await bcrypt.hash(password, 10);
+    await user.save();
+    res.json({ message: 'Пароль успішно змінено!' });
+  } catch (err) {
+    return res.status(400).json({ error: 'Невірний або прострочений токен.' });
+  }
+});
+// ...existing code...
+
+app.post('/api/register', async (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'Всі поля обовʼязкові.' });
+  }
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return res.status(400).json({ error: 'Користувач з таким email вже існує.' });
+  }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = new User({ name, email, password: hashedPassword });
+  await user.save();
+  // Генеруємо токен
+  const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: '2h' });
+  res.json({ message: 'Реєстрація успішна!', token });
+});
+
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(400).json({ error: 'Користувача не знайдено.' });
+  }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return res.status(400).json({ error: 'Невірний пароль.' });
+  }
+  // Генеруємо токен
+  const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: '2h' });
+  res.json({ message: 'Вхід успішний!', token });
+});
+// Middleware для перевірки токена
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Токен не надано' });
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Невірний токен' });
+    req.user = user;
+    next();
+  });
+}
+
+app.listen(5000, () => {
+  console.log('Backend запущено на http://localhost:5000');
+});
