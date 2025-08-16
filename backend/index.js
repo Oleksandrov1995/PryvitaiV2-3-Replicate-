@@ -8,12 +8,6 @@ import nodemailer from 'nodemailer';
 import { OAuth2Client } from 'google-auth-library';
 dotenv.config();
 
-// ...ініціалізація app, JWT_SECRET, mongoUri, userSchema, User вже є вище...
-
-// Google OAuth endpoint
-// ...імпорти вже є вище...
-dotenv.config();
-
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 const app = express();
 app.use(express.json());
@@ -27,6 +21,7 @@ mongoose.connect(mongoUri, {
 
 const userSchema = new mongoose.Schema({
   name: String,
+  phone: String,
   email: { type: String, unique: true },
   password: String,
 });
@@ -50,11 +45,23 @@ app.post('/api/google-auth', async (req, res) => {
       user = new User({ name, email, password: '' });
       await user.save();
     }
-    const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: '2h' });
+    const token = jwt.sign({ userId: user._id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '2h' });
     res.json({ message: 'Вхід через Google успішний!', token });
   } catch (err) {
     console.error('Google auth error:', err);
     res.status(500).json({ error: 'Помилка Google авторизації.' });
+  }
+});
+
+// Повернути профіль поточного користувача
+app.get('/api/me', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select('name email phone');
+    if (!user) return res.status(404).json({ error: 'Користувача не знайдено.' });
+    res.json({ user });
+  } catch (err) {
+    console.error('me error:', err);
+    res.status(500).json({ error: 'Помилка на сервері.' });
   }
 });
 
@@ -128,8 +135,8 @@ app.post('/api/register', async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = new User({ name, email, password: hashedPassword });
   await user.save();
-  // Генеруємо токен
-  const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: '2h' });
+  // Генеруємо токен (включаємо name для відображення на фронтенді)
+  const token = jwt.sign({ userId: user._id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '2h' });
   res.json({ message: 'Реєстрація успішна!', token });
 });
 
@@ -144,8 +151,55 @@ app.post('/api/login', async (req, res) => {
     return res.status(400).json({ error: 'Невірний пароль.' });
   }
   // Генеруємо токен
-  const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: '2h' });
+  const token = jwt.sign({ userId: user._id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '2h' });
   res.json({ message: 'Вхід успішний!', token });
+});
+
+// Оновлення телефону
+app.put('/api/update-phone', authMiddleware, async (req, res) => {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ error: 'Номер телефону обовʼязковий.' });
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(404).json({ error: 'Користувача не знайдено.' });
+    user.phone = phone;
+    await user.save();
+    res.json({ message: 'Телефон оновлено.' });
+  } catch (err) {
+    console.error('update-phone error:', err);
+    res.status(500).json({ error: 'Помилка на сервері.' });
+  }
+});
+
+// Зміна пароля (поточний + новий)
+app.post('/api/change-password', authMiddleware, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) return res.status(400).json({ error: 'Потрібні обидва паролі.' });
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(404).json({ error: 'Користувача не знайдено.' });
+    // Якщо пароль порожній (наприклад, Google-акаунт), не можна перевірити
+    if (!user.password) return res.status(400).json({ error: 'Пароль не встановлено для цього акаунту.' });
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) return res.status(400).json({ error: 'Поточний пароль невірний.' });
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ message: 'Пароль успішно змінено.' });
+  } catch (err) {
+    console.error('change-password error:', err);
+    res.status(500).json({ error: 'Помилка на сервері.' });
+  }
+});
+
+// Видалення акаунта
+app.delete('/api/delete-account', authMiddleware, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.user.userId);
+    res.json({ message: 'Акаунт видалено.' });
+  } catch (err) {
+    console.error('delete-account error:', err);
+    res.status(500).json({ error: 'Помилка на сервері.' });
+  }
 });
 // Middleware для перевірки токена
 function authMiddleware(req, res, next) {

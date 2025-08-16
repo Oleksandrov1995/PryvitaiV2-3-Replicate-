@@ -1,0 +1,44 @@
+.userpage-container {
+  max-width: 600px;
+  margin: 24px auto;
+  padding: 16px;
+}
+.user-info {
+  background: #f7f7f7;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+.card {
+  background: #fff;
+  border: 1px solid #e3e3e3;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+.small-form input {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+.small-form button {
+  padding: 8px 12px;
+}
+.msg {
+  margin-top: 8px;
+  color: #333;
+}
+.danger {
+  border-color: #ffcccc;
+  background: #fff5f5;
+}
+.delete-btn {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}

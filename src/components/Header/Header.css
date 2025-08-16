@@ -46,3 +46,21 @@
 .header-nav a:hover {
   color: #90caf9;
 }
+
+.logged-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-link svg {
+  background: rgba(255,255,255,0.12);
+  padding: 6px;
+  border-radius: 50%;
+}
+.user-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-decoration: none;
+}

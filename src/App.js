@@ -6,9 +6,10 @@ import Editor from './pages/Editor/Editor';
 import { Main } from './pages/Main/Main';
 import { GenereteText } from './pages/GenereteText/GenereteText';
 import { GenereteImage } from './pages/GenereteImage/GenereteImage';
-import SignUp from './pages/SignUp/SignUp';
-import SignIn from './pages/SignIn/SignIn';
-import ResetPassword from './pages/ResetPassword/ResetPassword';
+import SignUp from './pages/Registration/SignUp/SignUp';
+import SignIn from './pages/Registration/SignIn/SignIn';
+import ResetPassword from './pages/Registration/ResetPassword/ResetPassword';
+import UserPage from './pages/UserPage/UserPage';
 // import EditorWrapper from './components/Editor/EditorWrapper';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
     <Route path="/" element={<Main />} />
     <Route path="/signUp" element={<SignUp/>} />
     <Route path="/SignIn" element={<SignIn/>} />
+    <Route path="/UserPage" element={<UserPage/>} />
     <Route path="/GenereteText" element={<GenereteText/>} />
     <Route path="/GenereteImage" element={<GenereteImage/>} />
     <Route path="/GenereteImageAndText" element={<GenereteImageAndText />} />
