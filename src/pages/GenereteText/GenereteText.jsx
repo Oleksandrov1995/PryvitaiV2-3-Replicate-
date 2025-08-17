@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
 import "./GenereteText.css";
 import { 
   GenderAgeSection, 
@@ -11,26 +11,32 @@ import {
 
 } from "../../components/sections";
 import { useFormData } from "../../utils/formHandlers";
-import { ButtonToMain } from "../../components/ButtonToMain/ButtonToMain";
+import { PersonSection } from "../../components/sections/PersonSection/PersonSection";
 
 
 export const GenereteText = () => {
-  // refs для секцій
-  const genderAgeRef = useRef(null);
+  // refs для секцій у правильному порядку
   const greetingSubjectRef = useRef(null);
+  const genderAgeRef = useRef(null);
+  const personRef = useRef(null);
   const traitsRef = useRef(null);
   const hobbiesRef = useRef(null);
   const greetingTextRef = useRef(null);
+
+  // Масив refs, що відповідає порядку рендерингу компонентів
   const sectionRefs = [
-    genderAgeRef,
     greetingSubjectRef,
+    genderAgeRef,
+    personRef,
     traitsRef,
     hobbiesRef,
     greetingTextRef
   ];
+
   const { formData, updateField } = useFormData({   
     gender: '',
     age: '',
+    person: '', // Додано поле 'person'
     name: '',
     hobby: '',
     greetingText: '',
@@ -43,9 +49,12 @@ export const GenereteText = () => {
 
   // функція для скролу до наступної секції
   const createScrollToNextSection = (currentIndex) => () => {
-    const next = sectionRefs[currentIndex + 1]?.current;
-    if (next && typeof next.scrollIntoView === 'function') {
-      next.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < sectionRefs.length) {
+      const next = sectionRefs[nextIndex]?.current;
+      if (next && typeof next.scrollIntoView === 'function') {
+        next.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+      }
     }
   };
 
@@ -55,33 +64,39 @@ export const GenereteText = () => {
       <div className="form-header">
         <h1>Створи персоналізоване текстове привітання або жест разом з Привітайком</h1>
       </div>
-      <ButtonToMain />
-      <GenderAgeSection
+      <GreetingSubjectSection
         ref={sectionRefs[0]}
-        onGenderChange={handleFieldChange}
-        onAgeChange={handleFieldChange}
+        onSubjectChange={handleFieldChange}
         scrollToNextSection={createScrollToNextSection(0)}
       />
-      <GreetingSubjectSection
+      <GenderAgeSection
         ref={sectionRefs[1]}
-        onSubjectChange={handleFieldChange}
+        onGenderChange={handleFieldChange}
+        onAgeChange={handleFieldChange}
         scrollToNextSection={createScrollToNextSection(1)}
       />
-      <TraitsSection
+      <PersonSection
         ref={sectionRefs[2]}
-        onTraitChange={handleFieldChange}
+        onPersonChange={handleFieldChange}
         scrollToNextSection={createScrollToNextSection(2)}
+        selectedGender={formData.gender}
       />
       <HobbiesSection
         ref={sectionRefs[3]}
         onHobbyChange={handleFieldChange}
         scrollToNextSection={createScrollToNextSection(3)}
       />
-      <GreetingTextSection
+      <TraitsSection
         ref={sectionRefs[4]}
+        onTraitChange={handleFieldChange}
+        scrollToNextSection={createScrollToNextSection(4)}
+      />
+      
+      <GreetingTextSection
+        ref={sectionRefs[5]}
         onTextChange={handleFieldChange}
         formData={formData}
-        scrollToNextSection={createScrollToNextSection(4)}
+        scrollToNextSection={createScrollToNextSection(5)}
       />
     </div>
   );

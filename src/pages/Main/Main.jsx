@@ -9,10 +9,11 @@ export const Main= () => {
   return (
     <div className="main">
       <Header/>
-      <button onClick={() => window.location.href="/GenereteText"}>Згенерувати текст</button>
-      <button onClick={() => window.location.href="/GenereteImage"}>Згенерувати зображення</button>
-      <button onClick={() => window.location.href="/GenereteImageAndText"}>Згенерувати текст + зображення</button>
-      <button onClick={() => window.location.href="/GenereteImageAndText"}>Стилізувати Ваше фото</button>
+      <h2>Оберіть яке привітання бажаєте створити:</h2>
+      <button onClick={() => window.location.href="/GenereteText"}>Текстове привітання</button>
+      {/* <button onClick={() => window.location.href="/GenereteImage"}>Креативне зображення</button> */}
+      <button onClick={() => window.location.href="/StylizePhotoForPostcard"}>Стилізувати фото під листівку</button>
+
     </div>
 
   );

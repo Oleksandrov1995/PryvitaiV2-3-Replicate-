@@ -64,10 +64,9 @@ const GreetingTextSection = forwardRef(({ onTextChange, scrollToNextSection, for
   const generateGreetingIdeas = async () => {
     setIsGenerating(true);
     try {
-      console.log('FormData для генерації:', formData);
+    
       const prompt = greetingTextPrompts(formData);
-      console.log('Згенерований промпт:', prompt);
-      
+         
       const response = await fetch(API_URLS.GENERATE_GREETING, {
         method: 'POST',
         headers: {

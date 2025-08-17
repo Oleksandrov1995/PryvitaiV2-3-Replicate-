@@ -9,29 +9,30 @@ import { downloadImage } from "../../../utils/downloadImage";
 import { replicateCatImagePrompt, replicateImagePrompt } from "../../../prompts/replicate/replicateImagePrompt";
 import { generateImageReplicate } from "../../../config/generateImageReplicate";
 
-const ImageGenerationSection = forwardRef(({ onImageGenerated, scrollToNextSection, formData, onGenerateImageRef, greetingTextRef }, ref) => {
+const ImageGenerationSection = forwardRef(({ onImageGenerated, scrollToNextSection, formData, onGenerateImageRef, greetingTextRef, generateImageData, onShowGreeting }, ref) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState("");
   const navigate = useNavigate();
 
   // Функція для переходу до редактора
   const handleEditImage = () => {
-    if (generatedImageUrl) {
-      // Отримуємо текст з GreetingTextSection або з formData
-      let textToUse = '';
-      
-      if (greetingTextRef && greetingTextRef.current && greetingTextRef.current.getCurrentText) {
-        textToUse = greetingTextRef.current.getCurrentText();
-      } else {
-        textToUse = formData.greetingText || '';
-      }
-      
-      const params = new URLSearchParams({
-        imageUrl: generatedImageUrl,
-        text: textToUse
-      });
-      navigate(`/editor?${params.toString()}`);
+    if (!generatedImageUrl) return;
+
+    // If parent provided an onShowGreeting handler, call it to reveal the greeting form
+    if (typeof onShowGreeting === 'function') {
+      onShowGreeting();
+      return;
     }
+
+    // Fallback: navigate to editor with query params
+    let textToUse = '';
+    if (greetingTextRef && greetingTextRef.current && greetingTextRef.current.getCurrentText) {
+      textToUse = greetingTextRef.current.getCurrentText();
+    } else {
+      textToUse = formData.greetingText || '';
+    }
+    const params = new URLSearchParams({ imageUrl: generatedImageUrl, text: textToUse });
+    navigate(`/editor?${params.toString()}`);
   };
 
   const generateImage = useCallback(async () => {
@@ -60,16 +61,11 @@ const ImageGenerationSection = forwardRef(({ onImageGenerated, scrollToNextSecti
       }
       
       // Крок 2: Генерація промпта з URL фото
-      const formDataWithUrl = {
-        ...formData,
-        photoUrl: photoUrl
-      };
-      
-      const generatedPrompt = replicateImagePrompt(formDataWithUrl);
-      console.log('Промпт для replicate:', generatedPrompt);
-      
-      const data = await generateImagePrompt(generatedPrompt);
-      
+     
+
+      const data = await generateImagePrompt(generateImageData.prompt);
+      console.log(generateImageData.prompt);
+
       if (data.generatedPrompt) {
         console.log('Згенерований промпт:', data.generatedPrompt);
         // Крок 3: Генерація зображення через Replicate
@@ -79,11 +75,11 @@ const ImageGenerationSection = forwardRef(({ onImageGenerated, scrollToNextSecti
             throw new Error('Відсутній згенерований промпт');
           }
           const generatedImageUrl = await generateImageReplicate({
-            modelId: "black-forest-labs/flux-kontext-pro",
+            modelId: generateImageData.modelId,
             input: {
-              prompt: "Make this a 90s cartoon",
+              prompt: data.generatedPrompt,
               input_image: photoUrl,
-              aspect_ratio: "match_input_image",
+              aspect_ratio: generateImageData.aspect_ratio || "match_input_image",
               // strength: 0.8 // можна додати додаткові параметри за потреби
             }
           });
@@ -187,8 +183,8 @@ const ImageGenerationSection = forwardRef(({ onImageGenerated, scrollToNextSecti
           </button>
           
           <button 
+                       className="edit-button"
             onClick={handleEditImage}
-            className="edit-button"
           >
             ✏️ Додати текст привітання
           </button>

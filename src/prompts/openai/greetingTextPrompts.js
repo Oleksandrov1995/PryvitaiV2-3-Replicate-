@@ -3,7 +3,7 @@
 export const greetingTextPrompts = (formData) => {
   const genderText = formData.gender === 'male' ? 'чоловічої' : formData.gender === 'female' ? 'жіночої' : 'не вказаної';
 
-  return `Сформуй 5 коротких текстів привітання українською мовою для особи ${formData.age ? `${formData.age} років` : 'різного віку'}, ${genderText} статі, Ім'я ${formData.name || 'не вказано'}.
+  return `Сформуй 5 коротких текстів привітання українською мовою для особи ${formData.age ? `${formData.age} років` : 'різного віку'}, ${genderText} статі, Ім'я ${formData.name || 'не вказано'}, ${formData.person || 'не вказано'}.
 
 Контекст привітання: ${formData.greetingSubject || 'загальне привітання'}.
 

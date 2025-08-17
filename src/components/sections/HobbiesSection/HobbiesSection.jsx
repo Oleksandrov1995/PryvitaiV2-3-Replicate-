@@ -64,9 +64,9 @@ const HobbiesSection = forwardRef(({ onHobbyChange, scrollToNextSection }, ref) 
 
   return (
     <section ref={ref} className="hobbies-section">
-      <h2>Атрибути та символи</h2>
-      <p className="selection-info">Оберіть до {maxSelections} варіантів ({selectedHobbies.length}/{maxSelections})</p> 
-      
+      <h2>Хоббі та атрибути</h2>
+      <p className="selection-info">Оберіть до {maxSelections} варіантів ({selectedHobbies.length}/{maxSelections})</p>
+
       <div className="hobbies-options">
         {optionsHobbies.map((hobby) => (
           <button
