@@ -1,14 +1,13 @@
 import React, { useState, forwardRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ImageGenerationSection.css";
-import { dalleImagePrompt } from "../../../prompts/openai/dalleImagePrompt";
-import { API_URLS } from "../../../config/api";
 import { uploadPhoto } from "../../../config/uploadPhoto";
 import { generateImagePrompt } from "../../../config/generateImagePrompt";
 import { downloadImage } from "../../../utils/downloadImage";
-import { replicateCatImagePrompt, replicateImagePrompt } from "../../../prompts/replicate/replicateImagePrompt";
 import { generateImageReplicate } from "../../../config/generateImageReplicate";
 
+import { StylizePhotoForPostcardApiSetting } from "../../../prompts/replicate/StylizePhotoForPostcardPrompt";
+import { createPromptFluxKontextPro } from "../../../prompts/replicate/StylizePhotoForPostcardPrompt";
 const ImageGenerationSection = forwardRef(({ onImageGenerated, scrollToNextSection, formData, onGenerateImageRef, greetingTextRef, generateImageData, onShowGreeting }, ref) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState("");
@@ -61,28 +60,23 @@ const ImageGenerationSection = forwardRef(({ onImageGenerated, scrollToNextSecti
       }
       
       // Крок 2: Генерація промпта з URL фото
+      const generatedImagePrompt = await generateImagePrompt(createPromptFluxKontextPro(formData));
      
 
-      const data = await generateImagePrompt(generateImageData.prompt);
-      console.log(generateImageData.prompt);
+      const generateImageData = StylizePhotoForPostcardApiSetting( generatedImagePrompt.generatedPrompt, photoUrl);
 
-      if (data.generatedPrompt) {
-        console.log('Згенерований промпт:', data.generatedPrompt);
+console.log('Дані для генерації зображення:', generateImageData);
+
+
+      if (generatedImagePrompt) {
+        console.log('Згенерований промпт:', generatedImagePrompt.generatedPrompt);
         // Крок 3: Генерація зображення через Replicate
         try {
           console.log('Відправляю запит до Replicate.');
-          if (!data.generatedPrompt) {
+          if (!generatedImagePrompt) {
             throw new Error('Відсутній згенерований промпт');
           }
-          const generatedImageUrl = await generateImageReplicate({
-            modelId: generateImageData.modelId,
-            input: {
-              prompt: data.generatedPrompt,
-              input_image: photoUrl,
-              aspect_ratio: generateImageData.aspect_ratio || "match_input_image",
-              // strength: 0.8 // можна додати додаткові параметри за потреби
-            }
-          });
+          const generatedImageUrl = await generateImageReplicate(generateImageData);
           setGeneratedImageUrl(generatedImageUrl);
           if (onImageGenerated) {
             onImageGenerated("finalGeneratedImageUrl", generatedImageUrl);
@@ -91,10 +85,10 @@ const ImageGenerationSection = forwardRef(({ onImageGenerated, scrollToNextSecti
           console.error('Помилка replicate:', makeError);
         }
         
-        if (onImageGenerated) {
-          onImageGenerated("generatedImagePrompt", data.generatedPrompt);
-          onImageGenerated("imageUrl", photoUrl);
-        }
+        // if (onImageGenerated) {
+        //   onImageGenerated("generatedImagePrompt", data.generatedPrompt);
+        //   onImageGenerated("imageUrl", photoUrl);
+        // }
         
         // Автоскрол після успішної генерації
         if (scrollToNextSection) {
