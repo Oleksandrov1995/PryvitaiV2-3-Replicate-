@@ -20,10 +20,24 @@ mongoose.connect(mongoUri, {
 });
 
 const userSchema = new mongoose.Schema({
-  name: String,
-  phone: String,
-  email: { type: String, unique: true },
-  password: String,
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  phone: { type: String, default: null },  
+  password: {
+    type: String,
+    required: true
+  },
+   galleryImage: {
+    type: [String],
+    default: []    
+  },
 });
 
 const User = mongoose.model('User', userSchema);
@@ -201,6 +215,84 @@ app.delete('/api/delete-account', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Помилка на сервері.' });
   }
 });
+
+
+// Додавання зображення до галереї користувача
+app.post('/api/users/gallery', authMiddleware, async (req, res) => {
+  const { imageUrl } = req.body;
+  if (!imageUrl) {
+    return res.status(400).json({ error: 'URL зображення є обов\'язковим.' });
+  }
+
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Користувача не знайдено.' });
+    }
+
+    // Додаємо нове посилання в масив
+    user.galleryImage.push(imageUrl);
+    await user.save();
+
+    res.status(201).json({ message: 'Зображення успішно додано до галереї.' });
+  } catch (err) {
+    console.error('Помилка додавання до галереї:', err);
+    res.status(500).json({ error: 'Помилка сервера при додаванні зображення.' });
+  }
+});
+
+// Отримання галереї поточного користувача
+app.get('/api/users/gallery', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select('galleryImage');
+    if (!user) {
+      return res.status(404).json({ error: 'Користувача не знайдено.' });
+    }
+    
+    // Форматуємо дані, щоб вони відповідали очікуванням фронтенд-компонента
+    const formattedGallery = user.galleryImage.map((url, index) => ({
+      id: `${req.user.userId}_${index}`, // Створюємо унікальний ключ
+      url: url,
+      createdBy: req.user.userId
+    }));
+
+    res.json(formattedGallery);
+  } catch (err) {
+    console.error('Помилка отримання галереї:', err);
+    res.status(500).json({ error: 'Помилка сервера при отриманні галереї.' });
+  }
+});
+
+// Видалення зображення з галереї користувача
+app.delete('/api/users/gallery/:index', authMiddleware, async (req, res) => {
+  const index = parseInt(req.params.index, 10);
+
+  if (isNaN(index)) {
+    return res.status(400).json({ error: 'Невірний індекс зображення.' });
+  }
+
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Користувача не знайдено.' });
+    }
+
+    if (index < 0 || index >= user.galleryImage.length) {
+      return res.status(400).json({ error: 'Індекс поза межами масиву.' });
+    }
+
+    // Видаляємо зображення
+    const removedImage = user.galleryImage.splice(index, 1);
+    await user.save();
+
+    res.json({ message: 'Зображення видалено з галереї.', removedImage });
+  } catch (err) {
+    console.error('Помилка видалення з галереї:', err);
+    res.status(500).json({ error: 'Помилка сервера при видаленні зображення.' });
+  }
+});
+
+
 // Middleware для перевірки токена
 function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];

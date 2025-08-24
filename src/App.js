@@ -10,6 +10,7 @@ import SignIn from './pages/Registration/SignIn/SignIn';
 import ResetPassword from './pages/Registration/ResetPassword/ResetPassword';
 import UserPage from './pages/UserPage/UserPage';
 import { StylizePhotoForPostcard } from './pages/StylizePhotoForPostcard/StylizePhotoForPostcard';
+import { GalleryPage } from './pages/Gallery/GalleryPage';
 // import EditorWrapper from './components/Editor/EditorWrapper';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
     <Route path="/StylizePhotoForPostcard" element={<StylizePhotoForPostcard/>} />
     <Route path="/editor" element={<Editor />} />
     <Route path="/reset-password" element={<ResetPassword />} />
+    <Route path="/gallery" element={<GalleryPage/>} />
         </Routes>
       </div>
     </Router>
