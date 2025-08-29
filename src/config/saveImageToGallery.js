@@ -1,3 +1,4 @@
+import { API_URLS } from "./api";
 
 
 
@@ -9,7 +10,7 @@ export async function saveImageToGallery(imageUrl) {
   }
 
   try {
-    const response = await fetch("http://localhost:5000/api/users/gallery", {
+    const response = await fetch(API_URLS.GALLERY, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

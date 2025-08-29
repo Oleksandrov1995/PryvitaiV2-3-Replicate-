@@ -3,6 +3,7 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import './SignIn.css';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../../../components/Header/Header';
+import { API_URLS } from '../../config/api';
 
 const SignIn = () => {
   const [form, setForm] = useState({
@@ -30,7 +31,7 @@ const SignIn = () => {
       return;
     }
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
+      const res = await fetch(API_URLS.LOGIN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -74,7 +75,7 @@ const SignIn = () => {
       return;
     }
     try {
-      const res = await fetch('http://localhost:5000/api/forgot-password', {
+      const res = await fetch(API_URLS.FORGOT_PASSWORD, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -159,7 +160,7 @@ const SignIn = () => {
         <GoogleOAuthProvider clientId="411952234902-th0g5fji6s9cept1tkqmdn8qj5brivhc.apps.googleusercontent.com">
           <GoogleLogin
             onSuccess={credentialResponse => {
-              fetch('http://localhost:5000/api/google-auth', {
+              fetch(API_URLS.GOOGLE_AUTH, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ credential: credentialResponse.credential })

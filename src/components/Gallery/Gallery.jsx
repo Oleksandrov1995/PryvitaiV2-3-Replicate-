@@ -3,8 +3,9 @@ import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import "./Gallery.css";
 import {Download, Share } from "yet-another-react-lightbox/plugins";
+import { API_URLS } from "../../config/api";
 
-const Gallery = ({ apiEndpoint = "http://localhost:5000/api/users/gallery" }) => {
+const Gallery = ({ apiEndpoint = API_URLS.GET_GALLERY }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

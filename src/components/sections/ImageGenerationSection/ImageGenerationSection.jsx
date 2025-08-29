@@ -8,6 +8,7 @@ import { generateImageReplicate } from "../../../config/generateImageReplicate";
 
 import { StylizePhotoForPostcardApiSetting } from "../../../prompts/replicate/StylizePhotoForPostcardPrompt";
 import { createPromptFluxKontextPro } from "../../../prompts/replicate/StylizePhotoForPostcardPrompt";
+import { API_URLS } from "../../../config/api";
 
 // ДОДАЄМО сюди функцію для збереження в галерею
 async function saveImageToGallery(imageUrl) {
@@ -18,7 +19,7 @@ async function saveImageToGallery(imageUrl) {
   }
 
   try {
-    const response = await fetch("http://localhost:5000/api/users/gallery", {
+    const response = await fetch(API_URLS.ADD_TO_GALLERY, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

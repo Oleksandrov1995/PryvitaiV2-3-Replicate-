@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import './SignUp.css';
 import Header from '../../../components/Header/Header';
+import { API_URLS } from '../../../config/api';
 
 const SignUp = () => {
   const [form, setForm] = useState({
@@ -35,7 +36,7 @@ const SignUp = () => {
       return;
     }
     try {
-      const res = await fetch('http://localhost:5000/api/register', {
+      const res = await fetch(API_URLS.REGISTER, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -141,7 +142,7 @@ const SignUp = () => {
         <GoogleOAuthProvider clientId="411952234902-th0g5fji6s9cept1tkqmdn8qj5brivhc.apps.googleusercontent.com">
           <GoogleLogin
             onSuccess={credentialResponse => {
-              fetch('http://localhost:5000/api/google-auth', {
+              fetch(API_URLS.GOOGLE_AUTH, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ credential: credentialResponse.credential })

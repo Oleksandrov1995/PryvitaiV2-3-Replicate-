@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './UserPage.css';
 import { useNavigate } from 'react-router-dom';
+import { API_URLS } from '../../config/api';
 
 const UserPage = () => {
   const [name, setName] = useState('');
@@ -22,7 +23,7 @@ const UserPage = () => {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/me', {
+        const res = await fetch(API_URLS.GET_ME, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) {
@@ -58,7 +59,7 @@ const UserPage = () => {
     e.preventDefault();
     setPhoneMsg('');
     try {
-      const res = await fetch('http://localhost:5000/api/update-phone', {
+      const res = await fetch(API_URLS.UPDATE_PHONE, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ const UserPage = () => {
       return;
     }
     try {
-      const res = await fetch('http://localhost:5000/api/change-password', {
+      const res = await fetch(API_URLS.CHANGE_PASSWORD, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +115,7 @@ const UserPage = () => {
   const handleDeleteAccount = async () => {
     if (!window.confirm('Ви впевнені, що хочете видалити акаунт? Цю дію не можна скасувати.')) return;
     try {
-      const res = await fetch('http://localhost:5000/api/delete-account', {
+      const res = await fetch(API_URLS.DELETE_ACCOUNT, {
         method: 'DELETE',
         headers: {
           ...getAuthHeader()
