@@ -2,7 +2,6 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Editor from './pages/Editor/Editor';
-import { Main } from './pages/Main/Main';
 import { GenereteText } from './pages/GenereteText/GenereteText';
 import { GenereteImage } from './pages/GenereteImage/GenereteImage';
 import SignUp from './pages/Registration/SignUp/SignUp';
@@ -11,6 +10,7 @@ import ResetPassword from './pages/Registration/ResetPassword/ResetPassword';
 import UserPage from './pages/UserPage/UserPage';
 import { StylizePhotoForPostcard } from './pages/StylizePhotoForPostcard/StylizePhotoForPostcard';
 import { GalleryPage } from './pages/Gallery/GalleryPage';
+import { MainPage } from './pages/MainPage/MainPage';
 // import EditorWrapper from './components/Editor/EditorWrapper';
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-    <Route path="/" element={<Main />} />
+    <Route path="/" element={<MainPage />} />
     <Route path="/signUp" element={<SignUp/>} />
     <Route path="/SignIn" element={<SignIn/>} />
     <Route path="/UserPage" element={<UserPage/>} />

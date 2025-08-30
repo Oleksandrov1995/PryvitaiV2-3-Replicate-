@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { FiLogOut } from 'react-icons/fi';
 import './Header.css';
+import logo from '../../images/logo.png';
+import logoText from '../../images/logoText.png';
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,27 +23,47 @@ const Header = () => {
 
   return (
     <header className="header">
+      {/* Лого */}
       <div className="header-logo">
-        <Link to="/">Pryvitai</Link>
+        <Link to="/">
+          <img src={logo} alt="Pryvitai Logo" style={{ height: '50px' }} /> <img src={logoText} alt="Pryvitai LogoText" style={{ height: '40px' }} />
+        </Link>
       </div>
+
+      {/* Кнопка "Календар привітань" */}
+      <div className="calendar-btn">
+        <Link to="/calendar">Календар привітань</Link>
+      </div>
+
+      {/* Навігація */}
       <nav className="header-nav">
+        <Link to="/tariffs">Тарифи</Link>
+        <Link to="/promo">Акції</Link>
+        <Link to="/gallery">Галерея</Link>
+        <Link to="/events">Події</Link>
+      </nav>
+
+      {/* Авторизація */}
+      <div className="auth-actions">
         {isLoggedIn ? (
-          <div className="logged-actions">
-            <Link to="/gallery" className="gallery-link" title="Галерея">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          <>
+            <Link to="/userpage" className="user-avatar" title="Профіль">
+              <img
+                src="https://i.pravatar.cc/40"
+                alt="avatar"
+              />
             </Link>
-            <Link to="/userpage" className="user-link" title="Профіль">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </Link>
-            <button className="logout-btn" onClick={handleLogout}>Вийти</button>
-          </div>
+            <button title="Вийти" className="logout-btn" onClick={handleLogout}>
+              <FiLogOut />
+            </button>
+          </>
         ) : (
           <>
             <Link to="/SignIn">Вхід</Link>
-            <Link to="/">Реєстрація</Link>
+            <Link to="/SignUp">Реєстрація</Link>
           </>
         )}
-      </nav>
+      </div>
     </header>
   );
 };
