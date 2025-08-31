@@ -1,20 +1,16 @@
 import React, { useRef } from "react";
-import "./GenereteText.css";
-import { 
-  GenderAgeSection, 
-
+import "./GenerateText.css";
+import {
+  GenderAgeSection,
   GreetingTextSection,
-
   TraitsSection,
   GreetingSubjectSection,
   HobbiesSection,
-
 } from "../../components/sections";
 import { useFormData } from "../../utils/formHandlers";
 import { PersonSection } from "../../components/sections/PersonSection/PersonSection";
 
-
-export const GenereteText = () => {
+export const GenerateText = () => {
   // refs для секцій у правильному порядку
   const greetingSubjectRef = useRef(null);
   const genderAgeRef = useRef(null);
@@ -30,18 +26,18 @@ export const GenereteText = () => {
     personRef,
     traitsRef,
     hobbiesRef,
-    greetingTextRef
+    greetingTextRef,
   ];
 
-  const { formData, updateField } = useFormData({   
-    gender: '',
-    age: '',
-    person: '', // Додано поле 'person'
-    name: '',
-    hobby: '',
-    greetingText: '',
-    greetingSubject: '',
-    trait: '',
+  const { formData, updateField } = useFormData({
+    gender: "",
+    age: "",
+    person: "", // Додано поле 'person'
+    name: "",
+    hobby: "",
+    greetingText: "",
+    greetingSubject: "",
+    trait: "",
   });
 
   // універсальна функція для зміни поля
@@ -52,17 +48,23 @@ export const GenereteText = () => {
     const nextIndex = currentIndex + 1;
     if (nextIndex < sectionRefs.length) {
       const next = sectionRefs[nextIndex]?.current;
-      if (next && typeof next.scrollIntoView === 'function') {
-        next.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+      if (next && typeof next.scrollIntoView === "function") {
+        next.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+          inline: "nearest",
+        });
       }
     }
   };
 
-
   return (
     <div className="main-dalle-first-image">
       <div className="form-header">
-        <h1>Створи персоналізоване текстове привітання або жест разом з Привітайком</h1>
+        <h1>
+          Створи персоналізоване текстове привітання або жест разом з
+          Привітайком
+        </h1>
       </div>
       <GreetingSubjectSection
         ref={sectionRefs[0]}
@@ -91,7 +93,7 @@ export const GenereteText = () => {
         onTraitChange={handleFieldChange}
         scrollToNextSection={createScrollToNextSection(4)}
       />
-      
+
       <GreetingTextSection
         ref={sectionRefs[5]}
         onTextChange={handleFieldChange}

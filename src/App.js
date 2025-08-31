@@ -1,16 +1,17 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import Editor from './pages/Editor/Editor';
-import { GenereteText } from './pages/GenereteText/GenereteText';
-import { GenereteImage } from './pages/GenereteImage/GenereteImage';
-import SignUp from './pages/Registration/SignUp/SignUp';
-import SignIn from './pages/Registration/SignIn/SignIn';
-import ResetPassword from './pages/Registration/ResetPassword/ResetPassword';
+
+import { GenerateText} from './pages/GenerateText/GenerateText';
 import UserPage from './pages/UserPage/UserPage';
 import { StylizePhotoForPostcard } from './pages/StylizePhotoForPostcard/StylizePhotoForPostcard';
 import { GalleryPage } from './pages/Gallery/GalleryPage';
 import { MainPage } from './pages/MainPage/MainPage';
+import { GenerateFluffyGreeting } from './pages/GenerateFluffyGreeting/GenerateFluffyGreeting';
+import SignUpPage from './pages/Registration/SignUpPage/SignUpPage';
+import SignInPage from './pages/Registration/SignIn/SignInPage';
+import ResetPasswordPage from './pages/Registration/ResetPasswordPage/ResetPasswordPage';
+import EditorPage from './pages/EditorPage/EditorPage';
 // import EditorWrapper from './components/Editor/EditorWrapper';
 
 function App() {
@@ -19,14 +20,14 @@ function App() {
       <div className="App">
         <Routes>
     <Route path="/" element={<MainPage />} />
-    <Route path="/signUp" element={<SignUp/>} />
-    <Route path="/SignIn" element={<SignIn/>} />
+    <Route path="/signUp" element={<SignUpPage/>} />
+    <Route path="/SignIn" element={<SignInPage/>} />
     <Route path="/UserPage" element={<UserPage/>} />
-    <Route path="/GenereteText" element={<GenereteText/>} />
-    <Route path="/GenereteImage" element={<GenereteImage/>} />
+    <Route path="/GenerateText" element={<GenerateText/>} />
+    <Route path="/GenerateFluffyGreeting" element={<GenerateFluffyGreeting/>} />
     <Route path="/StylizePhotoForPostcard" element={<StylizePhotoForPostcard/>} />
-    <Route path="/editor" element={<Editor />} />
-    <Route path="/reset-password" element={<ResetPassword />} />
+    <Route path="/editor" element={<EditorPage />} />
+    <Route path="/reset-password" element={<ResetPasswordPage/>} />
     <Route path="/gallery" element={<GalleryPage/>} />
         </Routes>
       </div>

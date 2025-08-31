@@ -12,7 +12,7 @@ const Main= () => {
       
     
         <button className="main-btn" onClick={() => window.location.href="/StylizePhotoForPostcard"}>Стилізувати фото під листівку</button>
-            <button className="main-btn" onClick={() => window.location.href="/GenereteImage"}>Привітання від домашнього улюбленця</button>
+            <button className="main-btn" onClick={() => window.location.href="/GenerateFluffyGreeting"}>Привітання від домашнього улюбленця</button>
        <button className="main-btn" onClick={() => window.location.href="/GenereteText"}>Текстове привітання</button>
       </div>
 

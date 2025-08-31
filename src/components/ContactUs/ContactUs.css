@@ -1,0 +1,34 @@
+.contact-section {
+  text-align: center;
+  padding: 80px 20px;
+  background: #faf7ff;
+}
+
+.contact-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 12px;
+}
+
+.contact-section p {
+  font-size: 15px;
+  color: #444;
+  margin-bottom: 24px;
+}
+
+.contact-btn {
+  padding: 10px 20px;
+  border-radius: 9999px;
+  border: none;
+  background: #8e44ee;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.contact-btn:hover {
+  background: #6f15e5;
+}

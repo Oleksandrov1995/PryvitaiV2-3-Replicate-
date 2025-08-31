@@ -1,5 +1,4 @@
 import React from "react";
-import "./GalleryPage.css";
 import Gallery from "../../components/Gallery/Gallery";
 
 
